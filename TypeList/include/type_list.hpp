@@ -2,6 +2,8 @@
 
 #include "helper_traits.hpp"
 
+#include <type_traits>
+
 namespace strike
 {
 	/**
@@ -19,6 +21,22 @@ namespace strike
 	*/
 	using empty_list = type_list<>;
 
+	/**
+	* check if typelist is empty
+	*/
+	template<typename List>
+	struct is_empty : value_is<false>
+	{
+	};
+
+	template<>
+	struct is_empty<empty_list> : value_is<true>
+	{
+	};
+
+	template<typename List>
+	constexpr auto is_empty_v = is_empty<List>::value;
+	
 	/**
 	* size of a typelist
 	*/
@@ -67,17 +85,45 @@ namespace strike
 	using pop_front_t = typename pop_front<List>::type;
 
 	/**
-	* push a new element in the front of a typelist
+	* push a new element at the front of a typelist
 	*/
-	template<typename List, typename NewType>
+	template<typename List, typename Element>
 	struct push_front;
 
-	template<typename... Types, typename NewType>
-	struct push_front<type_list<Types...>, NewType> : type_is<type_list<NewType, Types...>>
+	template<typename... Types, typename Element>
+	struct push_front<type_list<Types...>, Element> : type_is<type_list<Element, Types...>>
 	{
 	};
 
-	template<typename List, typename NewType>
-	using push_front_t = typename push_front<List, NewType>::type;
+	template<typename List, typename Element>
+	using push_front_t = typename push_front<List, Element>::type;
+
+	/**
+	* push a new element at the end of a typelist
+	*/
+
+	//  Here push_back is implemented in terms of primitive operations 
+	// front, push_front, pop_front, and is_empty
+	template<typename List, typename Element, bool Empty = is_empty_v<List>>
+	struct push_back;
+
+	template<typename List, typename Element>
+	struct push_back<List, Element, false>
+	{
+	private:
+		using first = front_t<List>;
+		using rest = pop_front_t<List>;
+		using push_back_rest = typename push_back<rest, Element>::type;
+	public:
+		using type = push_front_t<push_back_rest, first>;
+	};
+
+	template<typename List, typename Element>
+	struct push_back<List, Element, true> : type_is<push_front_t<List, Element>>
+	{
+	};
+
+	template<typename List, typename Element>
+	using push_back_t = typename push_back<List, Element>::type;
 
 } // namespace strike

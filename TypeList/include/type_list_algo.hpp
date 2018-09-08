@@ -28,11 +28,11 @@ namespace strike
 	/**
 	* Query the largest type in a typelist
 	*/
-	template<typename List>
+	template<typename List, bool Empty = is_empty_v<List>>
 	struct largest_type;
 
 	template<typename List>
-	struct largest_type
+	struct largest_type<List, false>
 	{
 	private:
 		using first = front_t<List>;
@@ -42,8 +42,8 @@ namespace strike
 		using type = std::conditional_t<sizeof(first) >= sizeof(tail_largest), first, tail_largest>;
 	};
 
-	template<>
-	struct largest_type<empty_list>
+	template<typename List>
+	struct largest_type<List, true>
 	{
 		using type = char;
 	};

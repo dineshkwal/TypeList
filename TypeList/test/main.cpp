@@ -15,10 +15,10 @@ void test_size()
 	constexpr auto empty_list_size = size_v<empty_list>;
 	static_assert(empty_list_size == 0);
 
-	constexpr auto int_char_list_size = strike::size_v<int_char_list>;
+	constexpr auto int_char_list_size = size_v<int_char_list>;
 	static_assert(int_char_list_size == 2);
 
-	constexpr auto signed_integral_types_size = strike::size_v<signed_integral_types>;
+	constexpr auto signed_integral_types_size = size_v<signed_integral_types>;
 	static_assert(signed_integral_types_size == 5);
 }
 
@@ -35,6 +35,24 @@ void test_push_front()
 
 	using int_list = push_front_t<empty_list, int>;
 	static_assert(std::is_same_v<front_t<int_list>, int>);
+}
+
+void test_push_back()
+{
+	using result_list_1 = push_back_t<int_char_list, double>;
+	static_assert(std::is_same_v<nth_element_t<result_list_1, 2>, double>);
+
+	using result_list_2 = push_back_t<empty_list, int>;
+	static_assert(std::is_same_v<front_t<result_list_2>, int>);
+}
+
+void test_is_empty()
+{
+	constexpr auto is_empty_1 = is_empty_v<empty_list>;
+	static_assert(is_empty_1 == true);
+
+	constexpr auto is_empty_2 = is_empty_v<int_char_list>;
+	static_assert(is_empty_2 == false);
 }
 
 void test_nth_element()
@@ -58,6 +76,7 @@ int main()
 	test_size();
 	test_front();
 	test_push_front();
+	test_is_empty();
 
 	// test algorithms
 	test_nth_element();
