@@ -99,6 +99,12 @@ void test_reverse()
 	static_assert(is_equal_v<result_type_2, empty_list>);
 }
 
+void test_transform()
+{
+	using result_type_1 = transform_t<int_char_list, std::add_const>;
+	static_assert(is_equal_v<result_type_1, type_list<const int, const char>>);
+}
+
 int main()
 {
 	test_is_empty();
@@ -112,4 +118,5 @@ int main()
 	test_is_equal();
 	test_largest_type();
 	test_reverse();
+	test_transform();
 }

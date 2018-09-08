@@ -211,4 +211,54 @@ namespace strike
 	template<typename List>
 	using pop_back_t = typename pop_back<List>::type;
 
+	/**
+	* transform the typelist by applying given unary metafunction to each type
+	*/
+	template<typename List, template<typename> class F,
+			bool Empty = is_empty_v<List>>
+	struct transform;
+
+	template<typename List, template<typename> class F>
+	using transform_t = typename transform<List, F>::type;
+
+	template<typename List, template<typename> class F>
+	struct transform<List, F, true> : type_is<List>
+	{
+	};
+
+	template<typename List, template<typename> class F>
+	struct transform<List, F, false> : push_front<
+		transform_t<pop_front_t<List>, F>,
+		typename F<front_t<List>>::type>
+	{
+	};
+
+	/**
+	* accumulate the result type by applying given binary metafunction and initial type I
+	*/
+	template<typename List, 
+			template<typename, typename> class F,
+			typename I,
+			bool Empty = is_empty_v<List>>
+	struct accumulate;
+
+	template<typename List,
+			template<typename, typename> class F,
+			typename I>
+	using accumulate_t = typename accumulate<List, F, I>::type;
+
+	template<typename List,
+			template<typename, typename> class F,
+			typename I>
+	struct accumulate<List, F, I, true> : type_is<I>
+	{
+	};
+
+	template<typename List,
+			template<typename, typename> class F,
+			typename I>
+	struct accumulate<List, F, I, false> : accumulate<pop_front_t<List>, F, typename F<I, front_t<List>>::type>
+	{
+	};
+
 } // namespace strike
