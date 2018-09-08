@@ -43,6 +43,15 @@ void test_nth_element()
 	static_assert(std::is_same_v<result_type, long>);
 }
 
+void test_largest_type()
+{
+	using result_type_1 = largest_type_t<empty_list>;
+	static_assert(std::is_same_v<result_type_1, char>);
+
+	using result_type_2 = largest_type_t<signed_integral_types>;
+	static_assert(std::is_same_v<result_type_2, long long>);
+}
+
 int main()
 {
 	// test basic operations
