@@ -261,4 +261,47 @@ namespace strike
 	{
 	};
 
+
+	/**
+	* insertion sort
+	*/
+	template<typename List,
+			template<typename, typename> class Compare,
+			bool Empty = is_empty_v<List>>
+	struct insertion_sort;
+
+	// insert_sorted helper metafunction
+	template<typename List, typename Element, template<typename, typename> class Compare,
+			bool Empty = is_empty_v<List>>
+	struct insert_sorted;
+
+	template<typename List, typename Element, template<typename, typename> class Compare>
+	struct insert_sorted<List, Element, Compare, false> : 
+		std::conditional_t<
+				Compare<Element, front_t<List>>::value,
+				push_front<List, Element>,
+				push_front<insert_sorted<pop_front_t<List>, Element, Compare>, front_t<List>>>
+	{
+	};
+
+	template<typename List, typename Element, template<typename, typename> class Compare>
+	struct insert_sorted<List, Element, Compare, true> : push_front<List, Element>
+	{
+	};
+
+	template<typename List,
+			template<typename, typename> class Compare>
+	struct insertion_sort<List, Compare, false> :
+		insert_sorted<insertion_sort<pop_front_t<List>, Compare>,
+					front_t<List>,
+					Compare>
+	{
+	};
+
+	template<typename List,
+			template<typename, typename> class Compare>
+	struct insertion_sort<List, Compare, true> : type_is<List>
+	{
+	};
+
 } // namespace strike

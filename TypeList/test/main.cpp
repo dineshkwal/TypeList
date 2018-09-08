@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cassert>
 #include <type_traits>
+#include <functional>
 
 using namespace strike;
 
@@ -105,6 +106,37 @@ void test_transform()
 	static_assert(is_equal_v<result_type_1, type_list<const int, const char>>);
 }
 
+namespace detail
+{
+	template<typename T, typename U>
+	struct larger_type : std::conditional<sizeof(T) >= sizeof(U), T, U>
+	{
+	};
+
+	template<typename T, typename U>
+	struct greater : std::conditional_t<sizeof(T) >= sizeof(U), value_is<true>, value_is<false>>
+	{
+	};
+
+	/*template<typename T, typename U>
+	using less = greater<U, T>;*/
+
+} // namespace detail
+
+void test_accumulate()
+{
+	using result_type = accumulate_t<int_char_list, detail::larger_type, double>;
+	static_assert(std::is_same_v<result_type, double>);
+}
+
+void test_insertion_sort()
+{
+	// TODO:
+	using result_type = insertion_sort<type_list<double, char, int>, detail::greater>;
+	//std::cout << size<result_type>::value;
+	//static_assert(is_equal_v<result_type, type_list<char, int, double>>);
+}
+
 int main()
 {
 	test_is_empty();
@@ -119,4 +151,5 @@ int main()
 	test_largest_type();
 	test_reverse();
 	test_transform();
+	test_accumulate();
 }
