@@ -6,7 +6,6 @@
 
 using namespace strike;
 
-using empty_list = type_list<>;
 using int_char_list = type_list<int, char>;
 using signed_integral_types = type_list<signed char, short, int, long, long long>;
 
@@ -28,8 +27,18 @@ void test_front()
 	static_assert(std::is_same_v<front_type, int>);
 }
 
+void test_push_front()
+{
+	using double_int_char_list = push_front_t<int_char_list, double>;
+	static_assert(std::is_same_v<front_t<double_int_char_list>, double>);
+
+	using int_list = push_front_t<type_list<>, int>;
+	static_assert(std::is_same_v<front_t<int_list>, int>);
+}
+
 int main()
 {
 	test_size();
 	test_front();
+	test_push_front();
 }
