@@ -37,6 +37,12 @@ void test_push_front()
 	static_assert(std::is_same_v<front_t<int_list>, int>);
 }
 
+void test_pop_front()
+{
+	using result_list = pop_front_t<int_char_list>;
+	static_assert(is_equal_v<result_list, type_list<char>>);
+}
+
 void test_push_back()
 {
 	using result_list_1 = push_back_t<int_char_list, double>;
@@ -44,6 +50,12 @@ void test_push_back()
 
 	using result_list_2 = push_back_t<empty_list, int>;
 	static_assert(std::is_same_v<front_t<result_list_2>, int>);
+}
+
+void test_pop_back()
+{
+	using result_list = pop_back_t<int_char_list>;
+	static_assert(is_equal_v<result_list, type_list<int>>);
 }
 
 void test_is_empty()
@@ -70,14 +82,34 @@ void test_largest_type()
 	static_assert(std::is_same_v<result_type_2, long long>);
 }
 
+void test_is_equal()
+{
+	static_assert(is_equal_v<empty_list, empty_list>);
+	static_assert(!is_equal_v<empty_list, int_char_list>);
+	static_assert(is_equal_v<int_char_list, int_char_list>);
+	static_assert(!is_equal_v<int_char_list, signed_integral_types>);
+}
+
+void test_reverse()
+{
+	using result_type_1 = reverse_t<int_char_list>;
+	static_assert(is_equal_v<result_type_1, type_list<char, int>>);
+
+	using result_type_2 = reverse_t<empty_list>;
+	static_assert(is_equal_v<result_type_2, empty_list>);
+}
+
 int main()
 {
-	// test basic operations
+	test_is_empty();
 	test_size();
 	test_front();
 	test_push_front();
-	test_is_empty();
-
-	// test algorithms
+	test_pop_front();
+	test_push_back();
+	test_pop_back();
 	test_nth_element();
+	test_is_equal();
+	test_largest_type();
+	test_reverse();
 }

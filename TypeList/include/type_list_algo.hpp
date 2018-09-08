@@ -1,11 +1,117 @@
 #pragma once
 
 #include "type_list.hpp"
+#include "helper_traits.hpp"
 
 #include <type_traits>
 
 namespace strike
 {
+	/**
+	* check if typelist is empty
+	*/
+	template<typename List>
+	struct is_empty : value_is<false>
+	{
+	};
+
+	template<>
+	struct is_empty<empty_list> : value_is<true>
+	{
+	};
+
+	template<typename List>
+	constexpr auto is_empty_v = is_empty<List>::value;
+
+	/**
+	* size of a typelist
+	*/
+	template<typename List>
+	struct size;
+
+	template <>
+	struct size<empty_list> : value_is<0>
+	{
+	};
+
+	template<typename Head, typename... Tail>
+	struct size<type_list<Head, Tail...>> : value_is<1 + size<type_list<Tail...>>::value>
+	{
+	};
+
+	template<typename List>
+	constexpr auto size_v = size<List>::value;
+
+	/**
+	* front of a typelist
+	*/
+	template<typename List>
+	struct front;
+
+	template<typename Head, typename... Tail>
+	struct front<type_list<Head, Tail...>> : type_is<Head>
+	{
+	};
+
+	template<typename List>
+	using front_t = typename front<List>::type;
+
+	/**
+	* pop the front element of a typelist
+	*/
+	template<typename List>
+	struct pop_front;
+
+	template<typename Head, typename... Tail>
+	struct pop_front<type_list<Head, Tail...>> : type_is<type_list<Tail...>>
+	{
+	};
+
+	template<typename List>
+	using pop_front_t = typename pop_front<List>::type;
+
+	/**
+	* push a new element at the front of a typelist
+	*/
+	template<typename List, typename Element>
+	struct push_front;
+
+	template<typename... Types, typename Element>
+	struct push_front<type_list<Types...>, Element> : type_is<type_list<Element, Types...>>
+	{
+	};
+
+	template<typename List, typename Element>
+	using push_front_t = typename push_front<List, Element>::type;
+
+	/**
+	* push a new element at the end of a typelist
+	*/
+
+	//  Here push_back is implemented in terms of primitive operations 
+	// front, push_front, pop_front, and is_empty
+	template<typename List, typename Element, bool Empty = is_empty_v<List>>
+	struct push_back;
+
+	template<typename List, typename Element>
+	struct push_back<List, Element, false>
+	{
+	private:
+		using first = front_t<List>;
+		using rest = pop_front_t<List>;
+		using push_back_rest = typename push_back<rest, Element>::type;
+	public:
+		using type = push_front_t<push_back_rest, first>;
+	};
+
+	template<typename List, typename Element>
+	struct push_back<List, Element, true> : type_is<push_front_t<List, Element>>
+	{
+	};
+
+	template<typename List, typename Element>
+	using push_back_t = typename push_back<List, Element>::type;
+
 	/**
 	* Query the nth element in a typelist
 	*/
@@ -32,11 +138,14 @@ namespace strike
 	struct largest_type;
 
 	template<typename List>
+	using largest_type_t = typename largest_type<List>::type;
+	
+	template<typename List>
 	struct largest_type<List, false>
 	{
 	private:
 		using first = front_t<List>;
-		using tail_largest = typename largest_type<pop_front_t<List>>::type;
+		using tail_largest = largest_type_t<pop_front_t<List>>;
 
 	public:
 		using type = std::conditional_t<sizeof(first) >= sizeof(tail_largest), first, tail_largest>;
@@ -48,7 +157,58 @@ namespace strike
 		using type = char;
 	};
 
+
+	/**
+	* given 2 typelists, check if they are equal
+	*/
+	template<typename List1, typename List2>
+	struct is_equal : value_is<false>
+	{
+	};
+
+	template<typename List1, typename List2>
+	constexpr auto is_equal_v = is_equal<List1, List2>::value;
+
+	template<>
+	struct is_equal<empty_list, empty_list> : value_is<true>
+	{
+	};
+
+	template<typename Head1, typename... Tail1, typename Head2, typename... Tail2>
+	struct is_equal<type_list<Head1, Tail1...>, type_list<Head2, Tail2...>> :
+		value_is<std::is_same_v<Head1, Head2> && is_equal_v<type_list<Tail1...>, type_list<Tail2...>>>
+	{
+	};
+
+
+	/**
+	* reverse a typelist
+	*/
+	template<typename List, bool Empty = is_empty_v<List>>
+	struct reverse;
+
 	template<typename List>
-	using largest_type_t = typename largest_type<List>::type;
+	using reverse_t = typename reverse<List>::type;
+
+	template<typename List>
+	struct reverse<List, true> : type_is<List>
+	{
+	};
+
+	template<typename List>
+	struct reverse<List, false> : push_back<reverse_t<pop_front_t<List>>, front_t<List>>
+	{
+	};
+
+	/**
+	* remove the last element from a typelist
+	*/
+	template<typename List>
+	struct pop_back : type_is<reverse_t<pop_front_t<reverse_t<List>>>>
+	{
+	};
+
+	template<typename List>
+	using pop_back_t = typename pop_back<List>::type;
 
 } // namespace strike
