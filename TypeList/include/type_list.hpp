@@ -32,4 +32,19 @@ namespace strike
 	template<typename List>
 	constexpr auto size_v = size<List>::value;
 
+	/**
+	* front of a typelist
+	*/
+	template<typename List>
+	struct front;
+
+	template<typename Head, typename... Tail>
+	struct front<type_list<Head, Tail...>>
+	{
+		using type = Head;
+	};
+
+	template<typename List>
+	using front_t = typename front<List>::type;
+
 } // namespace strike
