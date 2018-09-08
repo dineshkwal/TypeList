@@ -30,7 +30,7 @@ namespace strike
 	};
 
 	template <>
-	struct size<type_list<>>
+	struct size<empty_list>
 	{
 		static constexpr size_t value = 0;
 	};

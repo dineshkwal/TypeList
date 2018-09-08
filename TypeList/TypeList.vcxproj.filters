@@ -23,5 +23,8 @@
     <ClInclude Include="include\type_list.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\type_list_algo.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
