@@ -1,5 +1,7 @@
 #pragma once
 
+#include "helper_traits.hpp"
+
 namespace strike
 {
 	/**
@@ -23,16 +25,14 @@ namespace strike
 	template<typename List>
 	struct size;
 
-	template<typename Head, typename... Tail>
-	struct size<type_list<Head, Tail...>>
+	template <>
+	struct size<empty_list> : value_is<0>
 	{
-		static constexpr size_t value = 1 + size<type_list<Tail...>>::value;
 	};
 
-	template <>
-	struct size<empty_list>
+	template<typename Head, typename... Tail>
+	struct size<type_list<Head, Tail...>> : value_is<1 + size<type_list<Tail...>>::value>
 	{
-		static constexpr size_t value = 0;
 	};
 
 	template<typename List>
@@ -45,9 +45,8 @@ namespace strike
 	struct front;
 
 	template<typename Head, typename... Tail>
-	struct front<type_list<Head, Tail...>>
+	struct front<type_list<Head, Tail...>> : type_is<Head>
 	{
-		using type = Head;
 	};
 
 	template<typename List>
@@ -60,9 +59,8 @@ namespace strike
 	struct pop_front;
 
 	template<typename Head, typename... Tail>
-	struct pop_front<type_list<Head, Tail...>>
+	struct pop_front<type_list<Head, Tail...>> : type_is<type_list<Tail...>>
 	{
-		using type = type_list<Tail...>;
 	};
 
 	template<typename List>
@@ -75,9 +73,8 @@ namespace strike
 	struct push_front;
 
 	template<typename... Types, typename NewType>
-	struct push_front<type_list<Types...>, NewType>
+	struct push_front<type_list<Types...>, NewType> : type_is<type_list<NewType, Types...>>
 	{
-		using type = type_list<NewType, Types...>;
 	};
 
 	template<typename List, typename NewType>

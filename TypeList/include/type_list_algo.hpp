@@ -10,16 +10,14 @@ namespace strike
 	template<typename List, size_t N>
 	struct nth_element;
 
-	template<typename Head, typename... Tail>
-	struct nth_element<type_list<Head, Tail...>, 0>
+	template<typename List>
+	struct nth_element<List, 0> : front<List>
 	{
-		using type = Head;
 	};
 
-	template<typename Head, typename... Tail, size_t N>
-	struct nth_element<type_list<Head, Tail...>, N>
+	template<typename List, size_t N>
+	struct nth_element : nth_element<pop_front_t<List>, N - 1>
 	{
-		using type = typename nth_element<type_list<Tail...>, N - 1>::type;
 	};
 
 	template<typename List, size_t N>

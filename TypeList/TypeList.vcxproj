@@ -127,6 +127,7 @@
     <ClCompile Include="test\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\helper_traits.hpp" />
     <ClInclude Include="include\type_list.hpp" />
     <ClInclude Include="include\type_list_algo.hpp" />
   </ItemGroup>
